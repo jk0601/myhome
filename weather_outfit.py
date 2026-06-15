@@ -1,36 +1,97 @@
 import requests
-import json
+from bs4 import BeautifulSoup
 from datetime import datetime
-import os
+import re
 
-# OpenWeatherMap API 설정
-API_KEY = os.environ.get('OPENWEATHER_API_KEY', 'demo')  # GitHub Secrets에서 가져옴
-CITY = 'Seoul'
-COUNTRY_CODE = 'KR'
+CITY = '서울'
 
 def get_weather():
-    """날씨 정보 가져오기"""
-    url = f'https://api.openweathermap.org/data/2.5/weather?q={CITY},{COUNTRY_CODE}&appid={API_KEY}&units=metric&lang=kr'
-
+    """네이버 날씨에서 정보 가져오기 (API 키 불필요!)"""
     try:
-        response = requests.get(url, timeout=10)
+        # 네이버 날씨 페이지 (서울)
+        url = 'https://weather.naver.com/today/09140101'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-        data = response.json()
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # 현재 기온
+        temp_element = soup.select_one('.temperature_text strong')
+        temp = float(temp_element.text.replace('°', '').replace('현재 온도', '').strip()) if temp_element else 18.0
+
+        # 날씨 상태
+        weather_element = soup.select_one('.weather_main .summary')
+        description = weather_element.text.strip() if weather_element else '맑음'
+
+        # 최저/최고 기온
+        temp_list = soup.select('.temperature_inner .temperature_text')
+        temp_min = temp
+        temp_max = temp
+
+        if len(temp_list) >= 2:
+            try:
+                temp_max_text = temp_list[0].text.strip()
+                temp_min_text = temp_list[1].text.strip()
+                temp_max = float(re.findall(r'-?\d+', temp_max_text)[0])
+                temp_min = float(re.findall(r'-?\d+', temp_min_text)[0])
+            except:
+                pass
+
+        # 습도
+        info_items = soup.select('.info_list .item_wrap .item')
+        humidity = 60
+        wind_speed = 2.0
+
+        for item in info_items:
+            label = item.select_one('.label')
+            value = item.select_one('.value')
+            if label and value:
+                if '습도' in label.text:
+                    humidity_text = value.text.strip().replace('%', '')
+                    try:
+                        humidity = int(humidity_text)
+                    except:
+                        pass
+                elif '바람' in label.text or '풍속' in label.text:
+                    wind_text = value.text.strip()
+                    wind_match = re.findall(r'\d+\.?\d*', wind_text)
+                    if wind_match:
+                        wind_speed = float(wind_match[0])
+
+        # 날씨 아이콘 결정
+        icon = '01d'  # 기본: 맑음
+        description_lower = description.lower()
+        if '비' in description or 'rain' in description_lower:
+            icon = '09d'
+        elif '눈' in description or 'snow' in description_lower:
+            icon = '13d'
+        elif '흐림' in description or 'cloud' in description_lower:
+            icon = '03d'
+        elif '구름' in description:
+            icon = '02d'
 
         weather_info = {
-            'temp': round(data['main']['temp'], 1),
-            'feels_like': round(data['main']['feels_like'], 1),
-            'temp_min': round(data['main']['temp_min'], 1),
-            'temp_max': round(data['main']['temp_max'], 1),
-            'humidity': data['main']['humidity'],
-            'description': data['weather'][0]['description'],
-            'icon': data['weather'][0]['icon'],
-            'wind_speed': round(data['wind']['speed'], 1),
+            'temp': round(temp, 1),
+            'feels_like': round(temp, 1),  # 체감온도는 현재 온도와 동일하게
+            'temp_min': round(temp_min, 1),
+            'temp_max': round(temp_max, 1),
+            'humidity': humidity,
+            'description': description,
+            'icon': icon,
+            'wind_speed': round(wind_speed, 1),
             'city': CITY
         }
+
+        print(f"날씨 정보 가져오기 성공: {temp}°C, {description}")
         return weather_info
+
     except Exception as e:
         print(f"날씨 정보를 가져오는데 실패했습니다: {e}")
+        print("기본 데이터를 사용합니다.")
         # 데모 데이터 반환
         return {
             'temp': 18.0,

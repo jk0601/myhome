@@ -4,13 +4,14 @@
 
 ## ✨ 특징
 
-- 🌡️ **실시간 날씨 정보** - OpenWeatherMap API 사용
+- 🌡️ **실시간 날씨 정보** - 네이버 날씨에서 스크래핑 (API 키 불필요!)
 - 👔 **스마트 코디 추천** - 기온, 날씨, 바람을 고려한 맞춤 추천
 - 🤖 **자동 업데이트** - GitHub Actions로 매일 아침 6시 자동 갱신
 - 📱 **반응형 디자인** - 모바일, 태블릿, PC 모두 지원
 - 🎨 **날씨별 테마** - 기온에 따라 다른 색상 테마
+- 🔑 **API 키 불필요** - 별도 가입이나 설정 없이 바로 사용!
 
-## 🚀 배포 방법
+## 🚀 배포 방법 (매우 간단!)
 
 ### 1단계: 리포지토리 포크/클론
 
@@ -19,33 +20,21 @@ git clone https://github.com/YOUR_USERNAME/myhome.git
 cd myhome
 ```
 
-### 2단계: OpenWeatherMap API 키 발급
-
-1. https://openweathermap.org/ 접속
-2. 무료 계정 생성
-3. API Keys 메뉴에서 API 키 복사
-
-### 3단계: GitHub Secrets 설정
-
-1. GitHub 리포지토리 → Settings → Secrets and variables → Actions
-2. **New repository secret** 클릭
-3. Name: `OPENWEATHER_API_KEY`
-4. Value: 발급받은 API 키 붙여넣기
-5. **Add secret** 클릭
-
-### 4단계: GitHub Pages 활성화
+### 2단계: GitHub Pages 활성화
 
 1. GitHub 리포지토리 → Settings → Pages
 2. Source: **Deploy from a branch** 선택
 3. Branch: **main** 선택, 폴더: **/ (root)** 선택
 4. **Save** 클릭
 
-### 5단계: 완료! 🎉
+### 3단계: 완료! 🎉
 
 몇 분 후 다음 주소에서 확인 가능:
 ```
 https://YOUR_USERNAME.github.io/myhome/
 ```
+
+**API 키 설정이 필요 없습니다!** GitHub Pages만 활성화하면 바로 작동합니다! 🎊
 
 ## 📅 자동 업데이트
 
