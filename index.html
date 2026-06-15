@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 날씨와 코디 추천</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #14b8a6 0%, #14b8a6dd 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .date {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .weather-section {
+            padding: 40px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, white 100%);
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .weather-icon {
+            font-size: 5em;
+        }
+
+        .weather-info {
+            flex: 1;
+            margin-left: 30px;
+        }
+
+        .temperature {
+            font-size: 4em;
+            font-weight: bold;
+            color: #14b8a6;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            color: #666;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .outfit-section {
+            padding: 40px;
+        }
+
+        .outfit-title {
+            font-size: 2em;
+            color: #14b8a6;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .outfit-category {
+            font-size: 2.5em;
+        }
+
+        .outfit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .outfit-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .outfit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        .outfit-card h3 {
+            color: #14b8a6;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .outfit-items {
+            list-style: none;
+        }
+
+        .outfit-items li {
+            padding: 8px 0;
+            color: #333;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .outfit-items li:last-child {
+            border-bottom: none;
+        }
+
+        .outfit-items li:before {
+            content: "✓ ";
+            color: #14b8a6;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #14b8a622 0%, #14b8a611 100%);
+            border-left: 4px solid #14b8a6;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .tip-box h3 {
+            color: #14b8a6;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .tip-box p {
+            color: #333;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .update-time {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .weather-main {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .weather-info {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+
+            .outfit-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌤️ 오늘의 날씨와 코디</h1>
+            <div class="date">2026년 06월 15일 Monday</div>
+        </div>
+
+        <div class="weather-section">
+            <div class="weather-main">
+                <div class="weather-icon">
+                    <img src="https://openweathermap.org/img/wn/01d@4x.png" alt="날씨 아이콘" style="width: 150px;">
+                </div>
+                <div class="weather-info">
+                    <div class="temperature">18.0°C</div>
+                    <div class="description">맑음</div>
+                    <div class="weather-details">
+                        <div class="detail-item">
+                            <span>🌡️</span>
+                            <span>체감: 17.0°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>📊</span>
+                            <span>습도: 65%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🌡️</span>
+                            <span>최저/최고: 15.0°C / 20.0°C</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>💨</span>
+                            <span>바람: 3.5 m/s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="outfit-section">
+            <h2 class="outfit-title">
+                <span class="outfit-category">👕</span>
+                <span>봄/가을 코디</span>
+            </h2>
+
+            <div class="outfit-grid">
+                <div class="outfit-card">
+                    <h3>👕 상의</h3>
+                    <ul class="outfit-items">
+                        <li>긴팔 티셔츠</li>
+                        <li>얇은 셔츠</li>
+                        <li>맨투맨</li>
+                    </ul>
+                </div>
+
+                <div class="outfit-card">
+                    <h3>👖 하의</h3>
+                    <ul class="outfit-items">
+                        <li>청바지</li>
+                        <li>면바지</li>
+                        <li>슬랙스</li>
+                    </ul>
+                </div>
+
+                <div class="outfit-card">
+                    <h3>🧥 겉옷</h3>
+                    <ul class="outfit-items">
+                        <li>얇은 가디건</li>
+                        <li>바람막이</li>
+                    </ul>
+                </div>
+
+                <div class="outfit-card">
+                    <h3>🎒 액세서리</h3>
+                    <ul class="outfit-items">
+                        <li>선글라스</li>
+                        <li>가벼운 모자</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <h3>💡 오늘의 팁</h3>
+                <p>쾌적한 날씨입니다. 편안한 옷차림을 즐기세요!</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>매일 아침 6시에 자동으로 업데이트됩니다 ☀️</p>
+            <p class="update-time">마지막 업데이트: 2026-06-15 17:40:13</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Made with ❤️ using GitHub Actions</p>
+        </div>
+    </div>
+</body>
+</html>
